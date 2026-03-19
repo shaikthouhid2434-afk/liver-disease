@@ -10,14 +10,23 @@ import os
 app = Flask(__name__)
 
 # ── Load Model & Scaler ──────────────────────
-MODEL_PATH  = os.path.join('model', 'model.pkl')
-SCALER_PATH = os.path.join('model', 'scaler.pkl')
+# use paths relative to this file so the app works regardless of cwd
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH  = os.path.join(BASE_DIR, 'model', 'model.pkl')
+SCALER_PATH = os.path.join(BASE_DIR, 'model', 'scaler.pkl')
 
-with open(MODEL_PATH, 'rb') as f:
-    model = pickle.load(f)
+# Load the pre‑trained objects, fail fast with a clear message if missing
+try:
+    with open(MODEL_PATH, 'rb') as f:
+        model = pickle.load(f)
+except Exception as e:
+    raise RuntimeError(f"could not load model from '{MODEL_PATH}': {e}")
 
-with open(SCALER_PATH, 'rb') as f:
-    scaler = pickle.load(f)
+try:
+    with open(SCALER_PATH, 'rb') as f:
+        scaler = pickle.load(f)
+except Exception as e:
+    raise RuntimeError(f"could not load scaler from '{SCALER_PATH}': {e}")
 
 # ── Routes ───────────────────────────────────
 @app.route('/')
